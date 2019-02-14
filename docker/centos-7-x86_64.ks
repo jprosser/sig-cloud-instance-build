@@ -10,11 +10,12 @@
 # by using: cat centos-root.tar.xz | docker import -i imagename
 
 # Basic setup information
-url --url="http://mirrors.kernel.org/centos/7/os/x86_64/"
+url --url="http://centos.s.uw.edu/centos/7/os/x86_64/"
 install
 keyboard us
 rootpw --lock --iscrypted locked
-timezone --isUtc --nontp UTC
+auth  --useshadow  --passalgo=sha512 --enablekrb5 --krb5realm=u.washington.edu --krb5kdc=k5-primary.u.washington.edu --krb5adminserver=k5-primary.u.washington.edu
+timezone  America/Los_Angeles
 selinux --enforcing
 firewall --disabled
 network --bootproto=dhcp --device=link --activate --onboot=on
@@ -23,9 +24,7 @@ bootloader --disable
 lang en_US
 
 # Repositories to use
-repo --name="CentOS" --baseurl=http://mirror.centos.org/centos/7/os/x86_64/ --cost=100
-## Uncomment for rolling builds
-repo --name="Updates" --baseurl=http://mirror.centos.org/centos/7/updates/x86_64/ --cost=100
+repo --name=ks --baseurl=https://ks.iths.org/repos/centos/7/os/x86_64 --install
 
 # Disk setup
 zerombr
@@ -34,6 +33,11 @@ part / --size 3000 --fstype ext4
 
 # Package setup
 %packages --excludedocs --instLangs=en --nocore
+@security-tools
+pam_krb5
+krb5-workstation
+policycoreutils-python
+selinux-policy-devel
 bind-utils
 bash
 yum
